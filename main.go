@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -58,10 +59,12 @@ func main() {
 		w.Write(gen.GenerateSSE(0))
 		flusher.Flush()
 		counter := 1
+		log.Println("started")
 		for {
 			ticker := gen.NextTimer()
 			select {
 			case <-r.Context().Done():
+				log.Println("stopped")
 				return
 			case <-ticker.C:
 				w.Write(gen.GenerateSSE(counter))

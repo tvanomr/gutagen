@@ -52,6 +52,9 @@ func (g *Generator) FillParameters(args map[string][]string) error {
 	if err != nil {
 		g.TimeRange.Min = 0.5
 	}
+	if g.TimeRange.Min < 0.05 {
+		return errors.New("interval_min is too low, needs 50ms or more")
+	}
 	g.TimeRange.Max, err = parseArg(args, "interval_max")
 	if err != nil {
 		g.TimeRange.Max = 2
@@ -81,7 +84,7 @@ func (g *Generator) Generate() []byte {
 
 func (g *Generator) GenerateSSE(counter int) []byte {
 	var buffer bytes.Buffer
-	buffer.WriteString("event: randomdata\n")
+	buffer.WriteString("event: random_data\n")
 	buffer.WriteString("id: ")
 	buffer.WriteString(strconv.Itoa(counter))
 	buffer.WriteString("\ndata: ")
