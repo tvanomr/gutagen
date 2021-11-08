@@ -7,6 +7,15 @@ import (
 	"strconv"
 )
 
+func MirrorCORS(input http.Header, output http.Header) {
+	origins, ok := input["Origin"]
+	if ok {
+		for _, value := range origins {
+			output.Add("Access-Control-Allow-Origin", value)
+		}
+	}
+}
+
 func main() {
 	pPort := flag.Int("port", 24433, "port to listen on")
 	flag.Parse()
@@ -25,6 +34,7 @@ func main() {
 			return
 		}
 		w.Header().Add("Content-Type", "text/json")
+		MirrorCORS(r.Header, w.Header())
 		w.WriteHeader(http.StatusOK)
 		w.Write(append([]byte("\n"), gen.Generate()...))
 		flusher.Flush()
@@ -55,6 +65,7 @@ func main() {
 		}
 		w.Header().Add("Cache-Control", "no-cache")
 		w.Header().Add("Content-Type", "text/event-stream; charset=utf-8")
+		MirrorCORS(r.Header, w.Header())
 		w.WriteHeader(http.StatusOK)
 		w.Write(gen.GenerateSSE(0))
 		flusher.Flush()
